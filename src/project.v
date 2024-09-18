@@ -17,6 +17,7 @@ module tt_um_example (
 );
 
   // All output pins must be assigned. If not used, assign to 0.
+  wire[7:0] ui_in_inverted;
   assign ui_in_inverted = rst_n? ~ui_in : ui_in;
   assign uo_out  = ui_in_inverted + uio_in + rst_n;  // Example: ou_out is the sum of ui_in and uio_in
   assign uio_out = 0;
