@@ -41,6 +41,10 @@ module tb ();
 //      .cin(cin),
 //      .sum(sum),
 //      .cout(cout)
+      `ifdef GL_TEST
+        .VPWR(VPWR),
+        .VGND(VGND),
+      `endif
       .ui_in  (ui_in),    // Dedicated inputs
       .uo_out (uo_out),   // Dedicated outputs
       .uio_in (uio_in),   // IOs: Input path
