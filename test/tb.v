@@ -22,6 +22,10 @@ module tb ();
   wire [7:0] uo_out;
   wire [7:0] uio_out;
   wire [7:0] uio_oe;
+`ifdef GL_TEST
+      .VPWR(1'b1),
+      .VGND(1'b0),
+`endif
   //reg a;
   //reg b;
   //reg cin;
@@ -32,10 +36,7 @@ module tb ();
   //onebitfa user_project (
 
       // Include power ports for the Gate Level test:
-`ifdef GL_TEST
-      .VPWR(1'b1),
-      .VGND(1'b0),
-`endif
+
 //      .a(a),
 //      .b(b),
 //      .cin(cin),
