@@ -29,13 +29,13 @@
 module accumulator (
     input  wire       clk, // Clock signal
     inout  wire [7:0] bus,
-    input  wire       load,
-    input  wire       enable_output,
+    input  wire       load, // Load into regA from the 8 bit bus when 0,
+    input  wire       enable_output, // Output regA to the 8 bit bus when 1,
     output reg  [7:0] regA
 );
 
   always @(posedge clk ) begin
-    if (load)
+    if (!load)
         regA <= bus;
   end
   assign bus = enable_output ? regA : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
@@ -47,7 +47,7 @@ endmodule
 
 module add_sub_8bit_sync (
     input  wire       clk, // Clock signal
-    input  wire       enable_output, // Output result to the 8 bit bus when 0
+    input  wire       enable_output, // Output result to the 8 bit bus when 1
     input  wire [7:0] reg_a, // Register A
     input  wire [7:0] reg_b, // Register B
     input  wire       sub, // Addition/Subtraction if 0/1
@@ -59,9 +59,9 @@ module add_sub_8bit_sync (
   wire res_zero;
   wire [7:0] sum;
   add_sub_8bit addsub(reg_a, reg_b, sub, sum, carry_out, res_zero);
-  assign bus = !enable_output ? sum : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
+  assign bus = enable_output ? sum : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
   always @(posedge clk ) begin
-    if (!enable_output)
+    if (enable_output)
       CF <= carry_out;
       ZF <= res_zero;
   end
