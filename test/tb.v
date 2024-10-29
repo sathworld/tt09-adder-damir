@@ -52,7 +52,7 @@ module tb ();
   reg enable_output;
   wire [7:0] regA;
 
-  accumulator user_project(
+  accumulator_register user_project(
       .clk    (clk),      // clock
       .bus    (bus),
       .load   (load),
