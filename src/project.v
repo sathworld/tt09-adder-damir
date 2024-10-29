@@ -27,12 +27,11 @@ module tt_um_adder_accumulator_sathworld (
   wire ZF;
   
   
-  assign bus = uio_in[0] ? uo_in : 8'bz; // Input path
+  assign bus = uio_in[0] ? ui_in : 8'bZZZZZZZZ; // Input path
   assign uo_out = bus; 
   
   
   // All output pins must be assigned. If not used, assign to 0.
-  assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
   assign uio_out = 0;
   assign uio_oe  = 0;
   assign nLa = uio_in[1];
