@@ -1,6 +1,5 @@
 `default_nettype none
 `timescale 1ns / 1ps
-`include "../src/accumulator_register.v"
 /* This testbench just instantiates the module and makes some convenient wires
    that can be driven / tested by the cocotb test.py.
 */
@@ -31,10 +30,13 @@ module tb ();
 //   tt_um_example user_project (
 
 //       // Include power ports for the Gate Level test:
-// `ifdef GL_TEST
-//       .VPWR(VPWR),
-//       .VGND(VGND),
-// `endif
+`ifdef GL_TEST
+      `include "../src/accumulator_register.v"
+      `include "../src/project.v"
+      `include "../src/alu.v"
+      .VPWR(VPWR),
+      .VGND(VGND),
+`endif
 
 //       .ui_in  (ui_in),    // Dedicated inputs
 //       .uo_out (uo_out),   // Dedicated outputs
