@@ -25,11 +25,21 @@ module tt_um_adder_accumulator_sathworld (
   wire sub;
   wire CF;
   wire ZF;
-
+  
+  
+  assign bus = uio_in[0] ? uo_in : 8'bz; // Input path
+  assign uo_out = bus; 
+  
+  
   // All output pins must be assigned. If not used, assign to 0.
   assign uo_out  = ui_in + uio_in;  // Example: ou_out is the sum of ui_in and uio_in
   assign uio_out = 0;
   assign uio_oe  = 0;
+  assign nLa = uio_in[1];
+  assign Ea = uio_in[2];
+  assign Eu = uio_in[3];
+  assign regB = 0;
+  assign sub = uio_in[4];
 
   alu aluobj(clk, Eu, regA, regB, sub, bus, CF, ZF);
   accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA);
