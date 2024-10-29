@@ -1,4 +1,4 @@
-module accumulator (
+module accumulator_register (
     input  wire       clk, // Clock signal
     inout  wire [7:0] bus,
     input  wire       load, // Load into regA from the 8 bit bus when 0,
