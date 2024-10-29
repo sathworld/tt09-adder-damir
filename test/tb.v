@@ -3,6 +3,12 @@
 /* This testbench just instantiates the module and makes some convenient wires
    that can be driven / tested by the cocotb test.py.
 */
+
+`ifdef GL_TEST
+  `include "../src/accumulator_register.v"
+  `include "../src/project.v"
+  `include "../src/alu.v"
+`endif
 module tb ();
 
   // Dump the signals to a VCD file. You can view it with gtkwave.
@@ -22,9 +28,6 @@ module tb ();
 //   wire [7:0] uio_out;
 //   wire [7:0] uio_oe;
 `ifdef GL_TEST
-  `include "../src/accumulator_register.v"
-  `include "../src/project.v"
-  `include "../src/alu.v"
   wire VPWR = 1'b1;
   wire VGND = 1'b0;
 `endif
