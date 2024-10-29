@@ -46,19 +46,40 @@ module tb ();
 //       .rst_n  (rst_n)     // not reset
 //   );
 
-  reg clk; // Clock signal
-  reg [7:0] bus;
-  reg load;
-  reg enable_output;
-  wire [7:0] regA;
+reg clk; // Clock signal
+reg [7:0] bus;
+reg load;
+reg enable_output;
+wire [7:0] regA;
 
-  accumulator_register user_project(
-      .clk    (clk),      // clock
-      .bus    (bus),
-      .load   (load),
-      .enable_output (enable_output),
-      .regA   (regA)
-  );
+accumulator_register user_project(
+    .clk    (clk),      // clock
+    .bus    (bus),
+    .load   (load),
+    .enable_output (enable_output),
+    .regA   (regA)
+);
 
+
+// reg       clk; // Clock signal
+// reg       enable_output; // Output result to the 8 bit bus when 1
+// reg [7:0] reg_a; // Register A
+// reg [7:0] reg_b; // Register B
+// reg       sub; // Addition/Subtraction if 0/1
+// reg [7:0] bus; // Connection to the bus
+// wire      CF; // Carry out flag
+// wire      ZF; // Indicates if the result of the sum is 0
+
+
+// alu user_project(
+//     .clk    (clk),      // clock
+//     .enable_output (enable_output),
+//     .reg_a  (reg_a),
+//     .reg_b  (reg_b),
+//     .sub    (sub),
+//     .bus    (bus),
+//     .CF     (CF),
+//     .ZF     (ZF)
+// );
 
 endmodule
