@@ -18,10 +18,10 @@ async def test_project(dut):
     # Reset
     dut._log.info("Reset")
     dut.bus.value = LogicArray("ZZZZZZZZ")
-    dut.load.value = 0
+    dut.load.value = 1
     dut.enable_output.value = 0
     await ClockCycles(dut.clk, 10)
-    dut.load.value = 1
+    dut.load.value = 0
 
     dut._log.info("Test project behavior")
 
@@ -35,7 +35,7 @@ async def test_project(dut):
     # Change it to match the actual expected output of your module:
     assert dut.regA.value == 128
     dut.bus.value = LogicArray("ZZZZZZZZ")
-    dut.load.value = 0
+    dut.load.value = 1
     # Wait for two clock cycle to see the output values (one cycle fails)
     await ClockCycles(dut.clk, 1)
     dut.enable_output.value = 1
