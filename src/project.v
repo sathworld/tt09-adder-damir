@@ -16,12 +16,12 @@ module tt_um_adder_accumulator_sathworld (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  wire bus [7:0];
+  wire [7:0] bus;
   wire nLa;
   wire Ea;
   wire Eu;
-  wire regA [7:0];
-  wire regB [7:0];
+  wire [7:0] regA;
+  wire [7:0] regB;
   wire sub;
   wire CF;
   wire ZF;
@@ -34,6 +34,6 @@ module tt_um_adder_accumulator_sathworld (
   alu aluobj(clk, Eu, regA, regB, sub, bus, CF, ZF);
   accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA);
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, clk, rst_n, 1'b0};
+  wire _unused = &{ena, rst_n, 1'b0};
 
 endmodule
