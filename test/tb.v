@@ -6,7 +6,6 @@
 
 `ifdef GL_TEST
   `include "../src/accumulator_register.v"
-  `include "../src/project.v"
   `include "../src/alu.v"
 `endif
 module tb ();
