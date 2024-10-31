@@ -51,7 +51,7 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_oe[7] = 1;
 
   assign nLa = uio_in[1];
-  assign nLa = uio_in[2];
+  assign nLb = uio_in[2];
   assign Ea = uio_in[3];
   assign Eb = 0;
   assign Eu = uio_in[4];
