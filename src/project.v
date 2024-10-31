@@ -19,6 +19,8 @@ module tt_um_adder_accumulator_sathworld (
   wire [7:0] bus;
   wire nLa;
   wire Ea;
+  wire nLb;
+  wire Eb;
   wire Eu;
   wire [7:0] regA;
   wire [7:0] regB;
@@ -32,16 +34,35 @@ module tt_um_adder_accumulator_sathworld (
   
   
   // All output pins must be assigned. If not used, assign to 0.
-  assign uio_out = 0;
-  assign uio_oe  = 0;
+  assign uio_out[0] = 0;
+  assign uio_out[1] = 0;
+  assign uio_out[2] = 0;
+  assign uio_out[3] = 0;
+  assign uio_out[4] = 0;
+  assign uio_out[5] = 0;
+
+  assign uio_oe[0] = 0;
+  assign uio_oe[1] = 0;
+  assign uio_oe[2] = 0;
+  assign uio_oe[3] = 0;
+  assign uio_oe[4] = 0;
+  assign uio_oe[5] = 0;
+  assign uio_oe[6] = 1;
+  assign uio_oe[7] = 1;
+
   assign nLa = uio_in[1];
-  assign Ea = uio_in[2];
-  assign Eu = uio_in[3];
-  assign regB = 0;
-  assign sub = uio_in[4];
+  assign nLa = uio_in[2];
+  assign Ea = uio_in[3];
+  assign Eb = 0;
+  assign Eu = uio_in[4];
+  assign sub = uio_in[5];
+  assign uio_out[6] = CF;
+  assign uio_out[7] = CF;
+
 
   alu aluobj(clk, Eu, regA, regB, sub, bus, CF, ZF);
   accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA);
+  accumulator_register breg(clk, bus, nLb, Eb, regB);
   // List all unused inputs to prevent warnings
   wire _unused = &{ena, rst_n, 1'b0};
 
