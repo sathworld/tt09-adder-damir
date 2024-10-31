@@ -57,7 +57,7 @@ module tt_um_adder_accumulator_sathworld (
   assign Eu = uio_in[4];
   assign sub = uio_in[5];
   assign uio_out[6] = CF;
-  assign uio_out[7] = CF;
+  assign uio_out[7] = ZF;
 
 
   alu aluobj(clk, Eu, regA, regB, sub, bus, CF, ZF);
