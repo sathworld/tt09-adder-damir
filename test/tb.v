@@ -44,11 +44,11 @@ tt_um_adder_accumulator_sathworld user_project (
       .rst_n  (rst_n)     // not reset
 );
 
-reg clk; // Clock signal
-reg [7:0] bus;
-reg load;
-reg enable_output;
-wire [7:0] regA;
+// reg clk; // Clock signal
+// reg [7:0] bus;
+// reg load;
+// reg enable_output;
+// wire [7:0] regA;
 
 // accumulator_register user_project(
 //     .clk    (clk),      // clock
