@@ -14,7 +14,7 @@ module alu (
   add_sub_8bit addsub(reg_a, reg_b, sub, sum, carry_out, res_zero);
   assign bus = enable_output ? sum : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
   always @(posedge clk ) begin
-  if (enable_output)
+    if (enable_output)
       CF <= carry_out;
       ZF <= res_zero;
   end
