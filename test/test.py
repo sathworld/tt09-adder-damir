@@ -80,7 +80,7 @@ async def enable_regA_output(dut):
     dut.uio_in.value[3] = 1
     dut._log.info("Wait for Hi-Z to propogate to bus, and for control signals to update (Falling edge)")
     await FallingEdge(dut.clk)
-    assert (dut.uo_out.value != LogicArray("ZZZZZZZZ")) or (dut.uo_out.value != LogicArray("XXXXXXXX")), f"RegA read failed: got {dut.uo_out.value}"
+    assert (dut.uo_out.value != LogicArray("ZZZZZZZZ")) and (dut.uo_out.value != LogicArray("XXXXXXXX")), f"RegA read failed: got {dut.uo_out.value}"
 
 
 async def regAB_load_helper(dut, reg, val):

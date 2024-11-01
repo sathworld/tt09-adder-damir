@@ -64,6 +64,6 @@ module tt_um_adder_accumulator_sathworld (
   accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA);
   accumulator_register breg(clk, bus, nLb, Eb, regB);
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, rst_n, 1'b0};
+  wire _unused = &{ena, rst_n, uio_in[6], uio_in[7], 1'b0};
 
 endmodule
