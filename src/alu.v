@@ -15,7 +15,7 @@ module alu (
   assign bus = enable_output ? sum : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
   always @(posedge clk ) begin
     if (enable_output)
-        CF <= carry_out;
-        ZF <= res_zero;
+      CF <= carry_out;
+      ZF <= res_zero;
   end
 endmodule
