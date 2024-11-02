@@ -51,7 +51,7 @@ def bus_values(dut):
     dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
 def control_signal_values(dut):
     vals = dut.uio_in.value
-    dut._log.info(f"Current control signal values: output bus/n(regA)={vals[0]}, nLa={vals[1]}, nLb={vals[2]}, Ea={vals[3]}, Eu={vals[4]}, sub={vals[5]}")
+    dut._log.info(f"Current control signal values: output bus/n(regA)={vals[0]}, nLa={vals[1]}, nLb={vals[2]}, Ea={vals[3]}, Eu={vals[4]}, sub={vals[5]}, CF={vals[6]}, ZF={vals[7]}")
 
 
 def setbit(current, bit_index, bit_value):
