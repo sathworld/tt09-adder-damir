@@ -16,7 +16,10 @@ module tt_um_adder_accumulator_sathworld (
     input  wire       rst_n     // reset_n - low to reset
 );
 
-  wire [7:0] bus;
+  reg [7:0] bus;
+  wire busregA;
+  wire busAdd;
+  wire busregB;
   wire nLa;
   wire Ea;
   wire nLb;
@@ -29,7 +32,11 @@ module tt_um_adder_accumulator_sathworld (
   wire ZF;
   
   // ui_in NEEDS A BUFFER
-  assign bus = ena ? ui_in: 8'bZZZZZZZZ; // Input path
+  always @(posedge clk or negedge clk) begin
+    bus <= ui_in;
+    //bus <= Ea ? busregA : (Eu ? busAdd : ui_in);
+  end
+  // assign bus = ena ? ui_in: 8'bZZZZZZZZ; // Input path
   assign uo_out = uio_in[0] ? bus : regA; 
   
   
@@ -66,10 +73,9 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_out[7] = ZF;
 
 
-  alu aluobj(clk, Eu, regA, regB, sub, bus, CF, ZF);
-  accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA);
-//  accumulator_register breg(clk, bus, nLb, Eb, regB);
-  assign regB = regA;
+  //alu aluobj(clk, Eu, regA, regB, sub, busAdd, CF, ZF);
+  //accumulator_register accumulatorobj(clk, busregA, nLa, Ea, regA);
+  //accumulator_register breg(clk, busregB, nLb, Eb, regB);
   // List all unused inputs to prevent warnings
   wire _unused = &{rst_n, uio_in[6], uio_in[7], 1'b0};
 
