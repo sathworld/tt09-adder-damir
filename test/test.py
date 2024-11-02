@@ -51,12 +51,13 @@ def bus_values(dut):
     dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
 def control_signal_values(dut):
     vals = dut.uio_in.value
-    dut._log.info(f"Current control signal values: output bus/n(regA)={vals[0]}, nLa={vals[1]}, nLb={vals[2]}, Ea={vals[3]}, Eu={vals[4]}, sub={vals[5]}, CF={vals[6]}, ZF={vals[7]}")
+    dut._log.info(f"Current control signal: {dut.uio_in.value}")
+    dut._log.info(f"Current control signal values: output bus/n(regA)={vals[7]}, nLa={vals[6]}, nLb={vals[5]}, Ea={vals[4]}, Eu={vals[3]}, sub={vals[2]}, CF={vals[1]}, ZF={vals[0]}")
 
 
 def setbit(current, bit_index, bit_value):
     modified = current
-    modified[bit_index] = bit_value
+    modified[7-bit_index] = bit_value
     return modified
 
 async def init(dut):
@@ -66,7 +67,7 @@ async def init(dut):
 
     dut._log.info("Reset signals")
     bus_values(dut)
-    dut.uio_in.value = LogicArray("ZZ000111")
+    dut.uio_in.value = LogicArray("111000ZZ")
     # dut.uio_in.value[0] = 1 # Output Bus
     # dut.uio_in.value[1] = 1 # RegA, nLa
     # dut.uio_in.value[2] = 1 # RegB, nLb
@@ -92,7 +93,7 @@ async def enable_regA_output(dut):
     dut._log.info("Wait for Hi-Z to propogate to bus, and for control signals to update (Falling edge)")
     await FallingEdge(dut.clk)
     control_signal_values(dut)
-    assert (dut.uio_in.value[3] == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
+    assert (dut.uio_in.value[4] == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
     assert (dut.uo_out.value != "zzzzzzzz") and (dut.uo_out.value != "xxxxxxxx") and (dut.user_project.regA.value == dut.uo_out.value), f"RegA read failed: got {dut.uo_out.value}"
 
 
