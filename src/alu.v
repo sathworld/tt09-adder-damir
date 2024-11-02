@@ -16,8 +16,6 @@ module alu (
   always @(posedge clk) begin
     if (enable_output) begin
       CF <= carry_out;
-    end
-    if (enable_output) begin
       ZF <= res_zero;
     end
   end
