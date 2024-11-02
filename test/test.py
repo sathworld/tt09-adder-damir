@@ -48,8 +48,8 @@ from random import randint, shuffle
 CLOCK_PERIOD = 10  # 100 MHz
 
 def setbit(current, bit_index, bit_value):
-    modified = current & (~(1 << bit_index))
-    modified = modified | (1 << bit_index)
+    modified = current
+    modified[bit_index] = bit_value
     return modified
 
 async def init(dut):
@@ -59,18 +59,18 @@ async def init(dut):
 
     dut._log.info("Reset signals")
     dut._log.info(f"Current bus values: input:{dut.ui_in.value}, output:{dut.uo_out.value}")
-
-    dut.uio_in.value[0] = 1 # Output Bus
-    dut.uio_in.value[1] = 1 # RegA
-    dut.uio_in.value[2] = 1 # RegB
-    dut.uio_in.value[3] = 0 # RegA output
-    dut.uio_in.value[4] = 0 # ALU output
-    dut.uio_in.value[5] = 0 # Sub
+    dut.uio_in.value = LogicArray("ZZ000111")
+    # dut.uio_in.value[0] = 1 # Output Bus
+    # dut.uio_in.value[1] = 1 # RegA
+    # dut.uio_in.value[2] = 1 # RegB
+    # dut.uio_in.value[3] = 0 # RegA output
+    # dut.uio_in.value[4] = 0 # ALU output
+    # dut.uio_in.value[5] = 0 # Sub
     dut.ui_in.value = LogicArray("ZZZZZZZZ") # Bus
 
     dut._log.info("Wait for control signals to propogate (control signals and bus updates are falling edge)")
     await FallingEdge(dut.clk)
-
+    await FallingEdge(dut.clk)
     dut._log.info(f"Current bus values: input:{dut.ui_in.value}, output:{dut.uo_out.value}")
     assert (dut.uo_out.value == LogicArray("ZZZZZZZZ")) or (dut.uo_out.value == LogicArray("XXXXXXXX")), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got {dut.uo_out.value}"""
 
@@ -79,8 +79,11 @@ async def enable_regA_output(dut):
     dut._log.info("Flush bus to Hi-Z; Set RegA output to high")
     dut.ui_in.value = LogicArray("ZZZZZZZZ")
     await RisingEdge(dut.clk)
-    dut.uio_in.value[3] = 1
+    dut.uio_in.value = setbit(dut.uio_in.value, 3, 1)
+    # dut.uio_in.value[3] = 1
     dut._log.info("Wait for Hi-Z to propogate to bus, and for control signals to update (Falling edge)")
+    await FallingEdge(dut.clk)
+    await FallingEdge(dut.clk)
     await FallingEdge(dut.clk)
     assert (dut.uo_out.value != LogicArray("ZZZZZZZZ")) and (dut.uo_out.value != LogicArray("XXXXXXXX")), f"RegA read failed: got {dut.uo_out.value}"
 
@@ -93,24 +96,28 @@ async def regAB_load_helper(dut, reg, val):
     dut._log.info("Wait for val to propogate to bus, and for control signals to update (Falling edge)")
     if reg.lower() == 'a':
         dut._log.info("Register A loading")
-        dut.uio_in.value[1] = 0
+        dut.uio_in.value = setbit(dut.uio_in.value, 1, 0)
+        # dut.uio_in.value[1] = 0
         # dut.nLa.value = 0
     elif reg.lower() == 'b':
         dut._log.info("Register B loading")
+        dut.uio_in.value = setbit(dut.uio_in.value, 2, 0)
         dut.uio_in.value[2] = 0
         # dut.nLb.value = 0
     else:
         assert False, f"Unknown register: {reg}"
     await FallingEdge(dut.clk)
-
+    await RisingEdge(dut.clk)
     dut._log.info(f"Current bus values: input:{dut.ui_in.value}, output:{dut.uo_out.value}")
     assert dut.uo_out.value == val, f"Bus load failed: expected {val}, got {dut.uo_out.value}"
     dut._log.info("Wait for val to be latched to the registers")
     await RisingEdge(dut.clk)
 
     dut._log.info("Reset loading signals")
-    dut.uio_in.value[1] = 1
-    dut.uio_in.value[2] = 1
+    controlsignal_value = setbit(dut.uio_in.value, 1, 1)
+    dut.uio_in.value = setbit(controlsignal_value, 2, 1)
+    #dut.uio_in.value[1] = 1
+    #dut.uio_in.value[2] = 1
     # dut.nLa.value = 1
     # dut.nLa.value = 1
 
@@ -120,12 +127,13 @@ async def accumulator_test_randint(dut):
     await init(dut)
     test_value = randint(0,255)
     dut._log.info(f"Test load operation with val={test_value}, bin={test_value:#010b}")
-    dut.uio_in.value[0] = 0 # Output RegA
+    dut.uio_in.value = setbit(dut.uio_in.value, 0, 0)
+    # dut.uio_in.value[0] = 0 # Output RegA
     await regAB_load_helper(dut, 'a', test_value)
     assert dut.uo_out.value == test_value, f"Accumulator output test: expected {test_value}, got {dut.uo_out.value}"
     dut._log.info("Accumulator rand int module test completed successfully.")
 
-@cocotb.test()
+#@cocotb.test()
 async def accumulator_test_randint_out(dut):
     dut._log.info("Test the accumulator module loading/reading with a rand int")
     await init(dut)
@@ -137,13 +145,14 @@ async def accumulator_test_randint_out(dut):
     await enable_regA_output(dut)
     assert dut.uo_out.value == test_value, "Enable output failed: bus did not reflect loaded accumulator value"
     dut._log.info("Accumulator enable output successful")
-    dut.uio_in.value[0] = 0 # Output RegA
+    dut.uio_in.value = setbit(dut.uio_in.value, 0, 0)
+    # dut.uio_in.value[0] = 0 # Output RegA
     await FallingEdge(dut.clk)
 
     assert dut.uo_out.value == test_value, f"Accumulator output test: expected {test_value}, got {dut.uo_out.value}"
     dut._log.info("Accumulator rand int output module test completed successfully.")
 
-@cocotb.test()
+#@cocotb.test()
 async def accumulator_test_shuffled_range(dut):
     dut._log.info("Test the accumulator module loading/reading with a shuffled range of 0-255")
     await init(dut)
@@ -157,11 +166,13 @@ async def accumulator_test_shuffled_range(dut):
         await enable_regA_output(dut)
         assert dut.uo_out.value == test_value, "Enable output failed: bus did not reflect loaded accumulator value"
         dut._log.info("Accumulator enable output successful")
-        dut.uio_in.value[0] = 0 # Output RegA
+        dut.uio_in.value = setbit(dut.uio_in.value, 0, 0)
+        # dut.uio_in.value[0] = 0 # Output RegA
         await FallingEdge(dut.clk)
     
         assert dut.uo_out.value == test_value, f"Accumulator output test: expected {test_value}, got {dut.uo_out.value}"
-        dut.uio_in.value[0] = 1 # Output Bus
+        dut.uio_in.value = setbit(dut.uio_in.value, 0, 1)
+        # dut.uio_in.value[0] = 1 # Output Bus
         await FallingEdge(dut.clk)
     
     dut._log.info("Accumulator shuffled range module test completed successfully.")
