@@ -29,11 +29,11 @@ module tt_um_adder_accumulator_sathworld (
   wire ZF;
   
   
-  assign bus = ui_in; // Input path
-  assign uo_out = uio_in[0] ? ui_in : regA; 
+  // assign bus = ui_in; // Input path
+  // assign uo_out = uio_in[0] ? ui_in : regA; 
   
   
-  // All output pins must be assigned. If not used, assign to 0.
+  // // All output pins must be assigned. If not used, assign to 0.
   assign uio_out[0] = 0;
   assign uio_out[1] = 0;
   assign uio_out[2] = 0;
@@ -41,21 +41,27 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_out[4] = 0;
   assign uio_out[5] = 0;
 
-  assign uio_oe[0] = 0;
-  assign uio_oe[1] = 0;
-  assign uio_oe[2] = 0;
-  assign uio_oe[3] = 0;
-  assign uio_oe[4] = 0;
-  assign uio_oe[5] = 0;
-  assign uio_oe[6] = 1;
-  assign uio_oe[7] = 1;
+  // assign uio_oe[0] = 0;
+  // assign uio_oe[1] = 0;
+  // assign uio_oe[2] = 0;
+  // assign uio_oe[3] = 0;
+  // assign uio_oe[4] = 0;
+  // assign uio_oe[5] = 0;
+  // assign uio_oe[6] = 1;
+  // assign uio_oe[7] = 1;
 
-  assign nLa = uio_in[1];
-  assign nLb = uio_in[2];
-  assign Ea = uio_in[3];
+  // assign nLa = uio_in[1];
+  // assign nLb = uio_in[2];
+  // assign Ea = uio_in[3];
+  // assign Eb = 0;
+  // assign Eu = uio_in[4];
+  // assign sub = uio_in[5];
+  assign nlA = 1;
+  assign nLb = 1;
+  assign Ea = 0;
   assign Eb = 0;
-  assign Eu = uio_in[4];
-  assign sub = uio_in[5];
+  assign Eu = 0;
+  assign sub = 0;
   assign uio_out[6] = CF;
   assign uio_out[7] = ZF;
 
