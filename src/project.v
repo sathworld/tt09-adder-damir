@@ -28,8 +28,8 @@ module tt_um_adder_accumulator_sathworld (
   wire CF;
   wire ZF;
   
-  
-  assign bus = ui_in; // Input path
+  // ui_in NEEDS A BUFFER
+  assign bus = ena ? ui_in: 8'bZZZZZZZZ; // Input path
   assign uo_out = uio_in[0] ? bus : regA; 
   
   
@@ -71,6 +71,6 @@ module tt_um_adder_accumulator_sathworld (
 //  accumulator_register breg(clk, bus, nLb, Eb, regB);
   assign regB = regA;
   // List all unused inputs to prevent warnings
-  wire _unused = &{ena, rst_n, uio_in[6], uio_in[7], 1'b0};
+  wire _unused = &{rst_n, uio_in[6], uio_in[7], 1'b0};
 
 endmodule
