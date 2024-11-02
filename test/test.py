@@ -80,7 +80,7 @@ async def init(dut):
     await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF 
     control_signal_values(dut)
     bus_values(dut)
-    assert (dut.uo_out.value == LogicArray("ZZZZZZZZ") and (dut.user_project.bus.value == LogicArray("ZZZZZZZZ"))), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
+    assert (dut.uo_out.value == "zzzzzzzz") and (dut.user_project.bus.value == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
 
 
 async def enable_regA_output(dut):
@@ -93,7 +93,7 @@ async def enable_regA_output(dut):
     await FallingEdge(dut.clk)
     control_signal_values(dut)
     assert (dut.uio_in.value[3] == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
-    assert (dut.uo_out.value != LogicArray("ZZZZZZZZ")) and (dut.uo_out.value != LogicArray("XXXXXXXX") and (dut.user_project.regA.value == dut.uo_out.value)), f"RegA read failed: got {dut.uo_out.value}"
+    assert (dut.uo_out.value != "zzzzzzzz") and (dut.uo_out.value != "xxxxxxxx") and (dut.user_project.regA.value == dut.uo_out.value), f"RegA read failed: got {dut.uo_out.value}"
 
 
 async def regAB_load_helper(dut, reg, val):
