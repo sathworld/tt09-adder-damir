@@ -6,9 +6,9 @@ module accumulator_register (
     output reg  [7:0] regA
 );
 
-  always @(posedge clk) begin
-    //if (!load)
-    regA <= bus;
+  always @(posedge clk ) begin
+    if (!load)
+      regA <= bus;
   end
   assign bus = enable_output ? regA : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
   

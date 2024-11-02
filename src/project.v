@@ -29,7 +29,7 @@ module tt_um_adder_accumulator_sathworld (
   wire ZF;
   
   // ui_in NEEDS A BUFFER
-  always @(posedge clk or negedge clk) begin
+  always @(posedge clk) begin
     ui_in_buf <= ui_in;
   end
   assign bus = (!Ea & !Eu) ? ui_in_buf : 8'bZZZZZZZZ;
