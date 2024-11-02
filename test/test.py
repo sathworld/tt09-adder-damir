@@ -57,7 +57,7 @@ def control_signal_values(dut):
 
 def setbit(current, bit_index, bit_value):
     modified = current
-    modified[7-bit_index] = bit_value
+    modified[bit_index] = bit_value
     return modified
 
 async def init(dut):
