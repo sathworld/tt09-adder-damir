@@ -102,7 +102,7 @@ async def init(dut):
     dut._log.info("Reset signals")
     bus_values(dut)
     
-    dut.uio_in.value = LogicArray("111000ZZ")
+    dut.uio_in.value = LogicArray("1110000Z")
     # dut.uio_in.value[0] = 1 # Output Bus/RegA
     # dut.uio_in.value[1] = 1 # RegA, nLa
     # dut.uio_in.value[2] = 1 # RegB, nLb
@@ -126,6 +126,7 @@ async def init(dut):
 async def enable_regA_output(dut):
     dut._log.info("Flush bus to Hi-Z; Set RegA output to high")
     dut.ui_in.value = LogicArray("ZZZZZZZZ")
+    dut.uio_in.value = setbit(dut.uio_in.value, 6, 0)
     await RisingEdge(dut.clk)
     dut.uio_in.value = setbit(dut.uio_in.value, 3, 1)
     # dut.uio_in.value[3] = 1 # RegA output, Ea
@@ -145,6 +146,7 @@ async def regAB_load_helper(dut, reg, val):
     dut._log.info(f"Set bus to {val}, bin: {val:#010b}")
 
     dut.ui_in.value = val # Bus
+    dut.uio_in.value = setbit(dut.uio_in.value, 6, 1)
 
     dut._log.info("Wait for val to propogate to bus, and for control signals to update (Falling edge)")
     if reg.lower() == 'a':
@@ -171,9 +173,11 @@ async def regAB_load_helper(dut, reg, val):
     dut._log.info("Wait for val to be latched to the registers")
 
     dut._log.info("Reset loading signals")
-    controlsignal_value = setbit(dut.uio_in.value, 1, 1)
+    controlsignal_value = setbit(dut.uio_in.value, 6, 0)
+    controlsignal_value = setbit(controlsignal_value, 1, 1)
     dut.uio_in.value = setbit(controlsignal_value, 2, 1)
     dut.ui_in.value = LogicArray("ZZZZZZZZ")
+    
     #dut.uio_in.value[1] = 1
     #dut.uio_in.value[2] = 1
     # dut.nLa.value = 1

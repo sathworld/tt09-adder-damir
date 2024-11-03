@@ -31,12 +31,12 @@ module tt_um_adder_accumulator_sathworld (
   
   // ui_in NEEDS A BUFFER
   always @(posedge clk) begin
-    if (Ea | Eu)
+    if (!loading_onto_bus)
       ui_in_buf <= 8'b00000000;
     else
       ui_in_buf <= ui_in;
   end
-  assign bus = (!Ea & !Eu) ? ui_in_buf : 8'bZZZZZZZZ;
+  assign bus = (loading_onto_bus) ? ui_in_buf : 8'bZZZZZZZZ;
   //assign bus = Ea ? busregA : (Eu ? busAdd : ui_in_buf);
   // assign bus = ena ? ui_in: 8'bZZZZZZZZ; // Input path
   assign uo_out = bus_regA_sel ? bus : regA; 
@@ -56,7 +56,7 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_oe[4] = 0;
   assign uio_oe[3] = 0;
   assign uio_oe[2] = 0;
-  assign uio_oe[1] = 1;
+  assign uio_oe[1] = 0;
   assign uio_oe[0] = 1;
 
   assign bus_regA_sel = uio_in[7];
@@ -66,13 +66,8 @@ module tt_um_adder_accumulator_sathworld (
   assign Eb = 0;
   assign Eu = uio_in[3];
   assign sub = uio_in[2];
-  // assign nLa = 1;
-  // assign nLb = 1;
-  // assign Ea = 0;
-  // assign Eb = 0;
-  // assign Eu = 0;
-  // assign sub = 0;
-  assign uio_out[1] = CF;
+  assign loading_onto_bus = uio_in[1];
+  // assign uio_out[1] = CF;
   assign uio_out[0] = ZF;
 
 
