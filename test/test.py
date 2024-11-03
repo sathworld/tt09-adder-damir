@@ -56,7 +56,7 @@ def bus_values(dut):
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
     else:
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, output={dut.uo_out.value}")
-        
+
 def control_signal_values(dut):
     vals = dut.uio_in.value
     vals_out = dut.uio_out.value
@@ -80,7 +80,6 @@ def setbit(current, bit_index, bit_value):
 
 async def determine_gltest(dut):
     global GLTEST
-
     try:
         dut._log.info("See if the test is being run for GLTEST")
         if(dut.VPWR.value == 1):
@@ -96,10 +95,10 @@ async def determine_gltest(dut):
         assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
 
 async def init(dut):
-    await determine_gltest(dut)
     dut._log.info("Initialize clock")
     clock = Clock(dut.clk, CLOCK_PERIOD, units="ns")
     cocotb.start_soon(clock.start())
+    await determine_gltest(dut)
     dut.rst_n.value = 0
     await RisingEdge(dut.clk)
     dut.rst_n.value = 1
