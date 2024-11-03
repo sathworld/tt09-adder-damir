@@ -47,7 +47,7 @@ from random import randint, shuffle
 
 CLOCK_PERIOD = 10  # 100 MHz
 GLTEST = False
-LocalTest = True
+LocalTest = False
 
 async def bus_values(dut):
     dut._log.info(f"GLTEST={GLTEST}")
