@@ -98,6 +98,7 @@ async def init(dut):
     cocotb.start_soon(clock.start())
     dut._log.info("Reset signals")
     await determine_gltest(dut) # For some unknown reason, determine_gltest sometimes executes after bus_vals, which makes 0 sense
+    await FallingEdge(dut.clk)
     await bus_values(dut)
     dut.rst_n.value = 0
     dut.uio_in.value = LogicArray("1110000Z")
