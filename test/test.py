@@ -49,6 +49,7 @@ CLOCK_PERIOD = 10  # 100 MHz
 GLTEST = False
 LocalTest = False
 
+
 def bus_values(dut):
     dut._log.info(f"GLTEST={GLTEST}")
     if (not GLTEST):
@@ -76,7 +77,7 @@ def setbit(current, bit_index, bit_value):
         modified[bit_index] = bit_value
     return modified
 
-async def init(dut):
+async def determine_gltest(dut):
     global GLTEST
 
     try:
@@ -92,7 +93,8 @@ async def init(dut):
         dut._log.info("VPWR is NOT Defined, GLTEST=False")
         assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
 
-
+async def init(dut):
+    await determine_gltest(dut)
     dut._log.info("Initialize clock")
     clock = Clock(dut.clk, CLOCK_PERIOD, units="ns")
     cocotb.start_soon(clock.start())
