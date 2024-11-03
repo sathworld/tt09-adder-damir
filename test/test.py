@@ -55,6 +55,7 @@ def bus_values(dut):
     else:
         bus = LogicArray("XXXXXXXX")
         for i in range(8):
+            a = i
             #bus[i] = dut.user_project."\accumulatorobj.bus"[i]
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={bus}, output={dut.uo_out.value}")
 def control_signal_values(dut):
