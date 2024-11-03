@@ -81,14 +81,8 @@ async def determine_gltest(dut):
     global GLTEST
     dut._log.info("See if the test is being run for GLTEST")
     if hasattr(dut, 'VPWR'):
-        dut._log.info("VPWR is Defined, may not equal to 1, GLTEST=?")
+        dut._log.info("VPWR is Defined, may not equal to 1, GLTEST=TRUE")
         GLTEST = True
-        if(dut.VPWR.value == 1):
-            GLTEST = True
-            dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
-            # dut._log.info(dir(dut.user_project)) # log runs out bruh
-            #for i in dir(dut.user_project):
-            #    dut._log.info(i)
     else:
         GLTEST = False
         dut._log.info("VPWR is NOT Defined, GLTEST=False")
