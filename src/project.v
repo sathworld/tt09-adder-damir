@@ -25,6 +25,7 @@ module tt_um_adder_accumulator_sathworld (
   wire [7:0] regA;
   wire [7:0] regB;
   wire sub;
+  wire loading_onto_bus;
   wire CF;
   wire ZF;
   wire bus_regA_sel;
@@ -49,6 +50,7 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_out[4] = 0;
   assign uio_out[3] = 0;
   assign uio_out[2] = 0;
+  assign uio_out[1] = 0;
 
   assign uio_oe[7] = 0;
   assign uio_oe[6] = 0;
@@ -75,6 +77,6 @@ module tt_um_adder_accumulator_sathworld (
   accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA);
   accumulator_register breg(clk, bus, nLb, Eb, regB);
   // List all unused inputs to prevent warnings
-  wire _unused = &{rst_n, ena, uio_in[1], uio_in[0], uio_in[6], uio_in[7], 1'b0};
+  wire _unused = &{rst_n, ena, uio_in[1], uio_in[0], uio_in[6], uio_in[7], CF, 1'b0};
 
 endmodule

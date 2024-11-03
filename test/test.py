@@ -62,7 +62,7 @@ def control_signal_values(dut):
     vals_out = dut.uio_out.value
     dut._log.info(f"Current control signal: {vals}")
     dut._log.info(f"Current control output: {vals_out}")
-    dut._log.info(f"Current control signal values: output bus/n(regA)={read_control_signal_bit(vals,0)}, nLa={read_control_signal_bit(vals,1)}, nLb={read_control_signal_bit(vals,2)}, Ea={read_control_signal_bit(vals,3)}, Eu={read_control_signal_bit(vals,4)}, sub={read_control_signal_bit(vals,5)}, CF={read_control_signal_bit(vals_out,6)}, ZF={read_control_signal_bit(vals_out,7)}")
+    dut._log.info(f"Current control signal values: output bus/n(regA)={read_control_signal_bit(vals,0)}, nLa={read_control_signal_bit(vals,1)}, nLb={read_control_signal_bit(vals,2)}, Ea={read_control_signal_bit(vals,3)}, Eu={read_control_signal_bit(vals,4)}, sub={read_control_signal_bit(vals,5)}, load_onto_bus={read_control_signal_bit(vals,6)}, CF={read_control_signal_bit(vals_out,6)}, ZF={read_control_signal_bit(vals_out,7)}")
 
 def read_control_signal_bit(current, bit_index):
     if LocalTest:
@@ -125,6 +125,7 @@ async def init(dut):
 
 async def enable_regA_output(dut):
     dut._log.info("Flush bus to Hi-Z; Set RegA output to high")
+    await RisingEdge(dut.clk)
     dut.ui_in.value = LogicArray("ZZZZZZZZ")
     dut.uio_in.value = setbit(dut.uio_in.value, 6, 0)
     await RisingEdge(dut.clk)
@@ -146,17 +147,17 @@ async def regAB_load_helper(dut, reg, val):
     dut._log.info(f"Set bus to {val}, bin: {val:#010b}")
 
     dut.ui_in.value = val # Bus
-    dut.uio_in.value = setbit(dut.uio_in.value, 6, 1)
+    controlsignal_value = setbit(dut.uio_in.value, 6, 1)
 
     dut._log.info("Wait for val to propogate to bus, and for control signals to update (Falling edge)")
     if reg.lower() == 'a':
         dut._log.info("Register A loading")
-        dut.uio_in.value = setbit(dut.uio_in.value, 1, 0)
+        dut.uio_in.value = setbit(controlsignal_value, 1, 0)
         # dut.uio_in.value[1] = 0
         # dut.nLa.value = 0
     elif reg.lower() == 'b':
         dut._log.info("Register B loading")
-        dut.uio_in.value = setbit(dut.uio_in.value, 2, 0)
+        dut.uio_in.value = setbit(controlsignal_value, 2, 0)
         # dut.uio_in.value[2] = 0
         # dut.nLb.value = 0
     else:
