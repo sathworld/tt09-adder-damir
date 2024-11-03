@@ -52,7 +52,7 @@ def bus_values(dut):
 def control_signal_values(dut):
     vals = dut.uio_in.value
     dut._log.info(f"Current control signal: {dut.uio_in.value}")
-    dut._log.info(f"Current control signal values: output bus/n(regA)={vals[7]}, nLa={vals[6]}, nLb={vals[5]}, Ea={vals[4]}, Eu={vals[3]}, sub={vals[2]}, CF={vals[1]}, ZF={vals[0]}")
+    dut._log.info(f"Current control signal values: output bus/n(regA)={vals[0]}, nLa={vals[1]}, nLb={vals[2]}, Ea={vals[3]}, Eu={vals[4]}, sub={vals[5]}, CF={vals[6]}, ZF={vals[7]}")
 
 
 def setbit(current, bit_index, bit_value):
@@ -93,7 +93,7 @@ async def enable_regA_output(dut):
     dut._log.info("Wait for Hi-Z to propogate to bus, and for control signals to update (Falling edge)")
     await FallingEdge(dut.clk)
     control_signal_values(dut)
-    assert (dut.uio_in.value[4] == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
+    assert (dut.uio_in.value[3] == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
     assert (dut.uo_out.value != "zzzzzzzz") and (dut.uo_out.value != "xxxxxxxx") and (dut.user_project.regA.value == dut.uo_out.value), f"RegA read failed: got {dut.uo_out.value}"
 
 

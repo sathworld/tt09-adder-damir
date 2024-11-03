@@ -27,6 +27,7 @@ module tt_um_adder_accumulator_sathworld (
   wire sub;
   wire CF;
   wire ZF;
+  wire bus_regA_sel;
   
   // ui_in NEEDS A BUFFER
   always @(posedge clk) begin
@@ -35,7 +36,7 @@ module tt_um_adder_accumulator_sathworld (
   assign bus = (!Ea & !Eu) ? ui_in_buf : 8'bZZZZZZZZ;
   //assign bus = Ea ? busregA : (Eu ? busAdd : ui_in_buf);
   // assign bus = ena ? ui_in: 8'bZZZZZZZZ; // Input path
-  assign uo_out = uio_in[7] ? bus : regA; 
+  assign uo_out = bus_regA_sel ? bus : regA; 
   
   
   // // All output pins must be assigned. If not used, assign to 0.
@@ -55,6 +56,7 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_oe[1] = 1;
   assign uio_oe[0] = 1;
 
+  assign bus_regA_sel = uio_in[7];
   assign nLa = uio_in[6];
   assign nLb = uio_in[5];
   assign Ea = uio_in[4];
