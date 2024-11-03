@@ -56,6 +56,7 @@ def bus_values(dut):
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
     else:
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, output={dut.uo_out.value}")
+        
 def control_signal_values(dut):
     vals = dut.uio_in.value
     vals_out = dut.uio_out.value
@@ -99,10 +100,12 @@ async def init(dut):
     dut._log.info("Initialize clock")
     clock = Clock(dut.clk, CLOCK_PERIOD, units="ns")
     cocotb.start_soon(clock.start())
-
+    dut.rst_n.value = 0
+    await RisingEdge(dut.clk)
+    dut.rst_n.value = 1
     dut._log.info("Reset signals")
     bus_values(dut)
-    dut.uio_in.reset = 0
+    
     dut.uio_in.value = LogicArray("111000ZZ")
     # dut.uio_in.value[0] = 1 # Output Bus
     # dut.uio_in.value[1] = 1 # RegA, nLa
@@ -114,7 +117,6 @@ async def init(dut):
 
     dut._log.info("Wait for control signals to propogate (control signals and bus updates are falling edge)")
     await RisingEdge(dut.clk)
-    dut.uio_in.value = 1
     await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF
     await RisingEdge(dut.clk) 
     control_signal_values(dut)
