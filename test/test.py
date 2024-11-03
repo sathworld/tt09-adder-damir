@@ -113,7 +113,8 @@ async def init(dut):
 
     dut._log.info("Wait for control signals to propogate (control signals and bus updates are falling edge)")
     await RisingEdge(dut.clk)
-    await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF 
+    await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF
+    await RisingEdge(dut.clk) 
     control_signal_values(dut)
     bus_values(dut)
     if (not GLTEST):
