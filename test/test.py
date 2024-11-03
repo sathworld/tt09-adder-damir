@@ -102,6 +102,7 @@ async def init(dut):
 
     dut._log.info("Reset signals")
     bus_values(dut)
+    dut.uio_in.reset = 0
     dut.uio_in.value = LogicArray("111000ZZ")
     # dut.uio_in.value[0] = 1 # Output Bus
     # dut.uio_in.value[1] = 1 # RegA, nLa
@@ -113,6 +114,7 @@ async def init(dut):
 
     dut._log.info("Wait for control signals to propogate (control signals and bus updates are falling edge)")
     await RisingEdge(dut.clk)
+    dut.uio_in.value = 1
     await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF
     await RisingEdge(dut.clk) 
     control_signal_values(dut)

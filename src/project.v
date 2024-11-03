@@ -30,8 +30,11 @@ module tt_um_adder_accumulator_sathworld (
   wire bus_regA_sel;
   
   // ui_in NEEDS A BUFFER
-  always @(posedge clk) begin
-    ui_in_buf <= ui_in;
+  always @(posedge clk or rst_n) begin
+    if (!rst_n) begin
+      ui_in_buf <= 8'b00000000
+    else
+      ui_in_buf <= ui_in;
   end
   assign bus = (!Ea & !Eu) ? ui_in_buf : 8'bZZZZZZZZ;
   //assign bus = Ea ? busregA : (Eu ? busAdd : ui_in_buf);
