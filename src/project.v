@@ -40,7 +40,7 @@ module tt_um_adder_accumulator_sathworld (
   assign bus = (loading_onto_bus) ? ui_in_buf : 8'bZZZZZZZZ;
   //assign bus = Ea ? busregA : (Eu ? busAdd : ui_in_buf);
   // assign bus = ena ? ui_in: 8'bZZZZZZZZ; // Input path
-  assign uo_out = bus_regA_sel ? bus : bus; 
+  assign uo_out = bus_regA_sel ? bus : regA; 
   
   
   // // All output pins must be assigned. If not used, assign to 0.

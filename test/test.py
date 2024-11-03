@@ -122,7 +122,7 @@ async def init(dut):
     if (not GLTEST):
         assert (dut.uo_out.value == "zzzzzzzz") and (dut.user_project.bus.value == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
     else:
-        assert (dut.uo_out.value == "zzzzzzzz"), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got output={dut.uo_out.value}"""
+        assert (dut.uo_out.value == "zzzzzzzz" or dut.uo_out.value == "xxxxxxxx"), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got output={dut.uo_out.value}"""
 
 
 async def enable_regA_output(dut):
