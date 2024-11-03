@@ -74,8 +74,8 @@ module tt_um_adder_accumulator_sathworld (
 
 
   alu aluobj(clk, Eu, regA, regB, sub, bus, CF, ZF);
-  accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA);
-  accumulator_register breg(clk, bus, nLb, Eb, regB);
+  accumulator_register accumulatorobj(clk, bus, nLa, Ea, regA, rst_n);
+  accumulator_register breg(clk, bus, nLb, Eb, regB, rst_n);
   // List all unused inputs to prevent warnings
   wire _unused = &{rst_n, ena, uio_in[1], uio_in[0], uio_in[6], uio_in[7], CF, 1'b0};
 
