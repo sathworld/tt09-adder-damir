@@ -49,6 +49,9 @@ CLOCK_PERIOD = 10  # 100 MHz
 GLTEST = False
 LocalTest = False
 
+def busvals_and_gltest(dut):
+    determine_gltest(dut)
+    bus_values(dut)
 
 def bus_values(dut):
     dut._log.info(f"GLTEST={GLTEST}")
@@ -78,7 +81,7 @@ def setbit(current, bit_index, bit_value):
         modified[bit_index] = bit_value
     return modified
 
-async def determine_gltest(dut):
+def determine_gltest(dut):
     global GLTEST
     try:
         dut._log.info("See if the test is being run for GLTEST")
@@ -97,11 +100,8 @@ async def init(dut):
     dut._log.info("Initialize clock")
     clock = Clock(dut.clk, CLOCK_PERIOD, units="ns")
     cocotb.start_soon(clock.start())
-    await determine_gltest(dut)
-    await RisingEdge(dut.clk)
-    await RisingEdge(dut.clk)
     dut._log.info("Reset signals")
-    bus_values(dut)
+    busvals_and_gltest(dut) # For some unknown reason, determine_gltest sometimes executes after bus_vals, which makes 0 sense
     dut.rst_n.value = 0
     dut.uio_in.value = LogicArray("1110000Z")
     # dut.uio_in.value[0] = 1 # Output Bus/RegA
