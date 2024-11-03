@@ -50,14 +50,17 @@ GLTEST = False
 LocalTest = False
 
 def bus_values(dut):
+    dut._log.info(f"GLTEST={GLTEST}")
     if (not GLTEST):
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
     else:
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, output={dut.uo_out.value}")
 def control_signal_values(dut):
     vals = dut.uio_in.value
-    dut._log.info(f"Current control signal: {dut.uio_in.value}")
-    dut._log.info(f"Current control signal values: output bus/n(regA)={read_control_signal_bit(vals,0)}, nLa={read_control_signal_bit(vals,1)}, nLb={read_control_signal_bit(vals,2)}, Ea={read_control_signal_bit(vals,3)}, Eu={read_control_signal_bit(vals,4)}, sub={read_control_signal_bit(vals,5)}, CF={read_control_signal_bit(vals,6)}, ZF={read_control_signal_bit(vals,7)}")
+    vals_out = dut.uio_out.value
+    dut._log.info(f"Current control signal: {vals}")
+    dut._log.info(f"Current control output: {vals_out}")
+    dut._log.info(f"Current control signal values: output bus/n(regA)={read_control_signal_bit(vals,0)}, nLa={read_control_signal_bit(vals,1)}, nLb={read_control_signal_bit(vals,2)}, Ea={read_control_signal_bit(vals,3)}, Eu={read_control_signal_bit(vals,4)}, sub={read_control_signal_bit(vals,5)}, CF={read_control_signal_bit(vals_out,6)}, ZF={read_control_signal_bit(vals_out,7)}")
 
 def read_control_signal_bit(current, bit_index):
     if LocalTest:
@@ -85,6 +88,7 @@ async def init(dut):
             #for i in dir(dut.user_project):
             #    dut._log.info(i)
     except AttributeError:
+        GLTEST = False
         dut._log.info("VPWR is NOT Defined, GLTEST=False")
         assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
 
@@ -94,7 +98,7 @@ async def init(dut):
     cocotb.start_soon(clock.start())
 
     dut._log.info("Reset signals")
-    await bus_values(dut)
+    bus_values(dut)
     dut.uio_in.value = LogicArray("111000ZZ")
     # dut.uio_in.value[0] = 1 # Output Bus
     # dut.uio_in.value[1] = 1 # RegA, nLa
