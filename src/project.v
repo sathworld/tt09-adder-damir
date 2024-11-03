@@ -30,8 +30,8 @@ module tt_um_adder_accumulator_sathworld (
   wire bus_regA_sel;
   
   // ui_in NEEDS A BUFFER
-  always @(posedge clk or negedge rst_n) begin
-    if (!rst_n)
+  always @(posedge clk or negedge Ea or negedge Eu) begin
+    if (!Ea & !Eu)
       ui_in_buf <= 8'b00000000;
     else
       ui_in_buf <= ui_in;

@@ -105,7 +105,7 @@ async def init(dut):
     bus_values(dut)
     
     dut.uio_in.value = LogicArray("111000ZZ")
-    # dut.uio_in.value[0] = 1 # Output Bus
+    # dut.uio_in.value[0] = 1 # Output Bus/RegA
     # dut.uio_in.value[1] = 1 # RegA, nLa
     # dut.uio_in.value[2] = 1 # RegB, nLb
     # dut.uio_in.value[3] = 0 # RegA output, Ea
