@@ -98,9 +98,7 @@ async def init(dut):
     clock = Clock(dut.clk, CLOCK_PERIOD, units="ns")
     cocotb.start_soon(clock.start())
     await determine_gltest(dut)
-    dut.rst_n.value = 0
     await RisingEdge(dut.clk)
-    dut.rst_n.value = 1
     dut._log.info("Reset signals")
     bus_values(dut)
     

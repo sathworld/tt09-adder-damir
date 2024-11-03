@@ -31,7 +31,7 @@ module tt_um_adder_accumulator_sathworld (
   
   // ui_in NEEDS A BUFFER
   always @(posedge clk or negedge Ea or negedge Eu) begin
-    if (!Ea & !Eu)
+    if (Ea | Eu)
       ui_in_buf <= 8'b00000000;
     else
       ui_in_buf <= ui_in;
