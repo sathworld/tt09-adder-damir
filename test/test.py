@@ -50,8 +50,22 @@ GLTEST = False
 LocalTest = False
 
 def busvals_and_gltest(dut):
-    determine_gltest(dut)
-    bus_values(dut)
+    global GLTEST
+    try:
+        dut._log.info("See if the test is being run for GLTEST")
+        if(dut.VPWR.value == 1):
+            GLTEST = True
+            dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
+            dut._log.info(f"Current bus values: input={dut.ui_in.value}, output={dut.uo_out.value}")
+            # dut._log.info(dir(dut.user_project)) # log runs out bruh
+            #for i in dir(dut.user_project):
+            #    dut._log.info(i)
+    except AttributeError:
+        GLTEST = False
+        dut._log.info("VPWR is NOT Defined, GLTEST=False")
+        assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
+        dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
+
 
 def bus_values(dut):
     dut._log.info(f"GLTEST={GLTEST}")
