@@ -4,7 +4,7 @@ module accumulator_register (
     input  wire       load, // Load into regA from the 8 bit bus when 0,
     input  wire       enable_output, // Output regA to the 8 bit bus when 1,
     output reg  [7:0] regA,
-    input  wire [7:0] rst_n
+    input  wire       rst_n
 );
 
   always @(posedge clk or negedge rst_n) begin
