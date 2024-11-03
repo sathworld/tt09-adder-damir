@@ -159,6 +159,7 @@ async def regAB_load_helper(dut, reg, val):
         # dut.nLb.value = 0
     else:
         assert False, f"Unknown register: {reg}"
+    await RisingEdge(dut.clk)
     await FallingEdge(dut.clk)
     await RisingEdge(dut.clk)
     bus_values(dut)
