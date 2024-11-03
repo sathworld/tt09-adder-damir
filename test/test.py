@@ -55,7 +55,7 @@ def bus_values(dut):
     else:
         bus = LogicArray("XXXXXXXX")
         for i in range(8):
-            bus[i] = dut.user_project.accumulatorobj.bus[i]
+            #bus[i] = dut.user_project."\accumulatorobj.bus"[i]
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={bus}, output={dut.uo_out.value}")
 def control_signal_values(dut):
     vals = dut.uio_in.value
@@ -84,6 +84,7 @@ async def init(dut):
         if(dut.VPWR.value == 1):
             GLTEST = True
             dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
+            dut._log.info(dir(dut.user_project))
     except AttributeError:
         dut._log.info("VPWR is NOT Defined, GLTEST=False")
         assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
