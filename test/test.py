@@ -47,34 +47,16 @@ from random import randint, shuffle
 
 CLOCK_PERIOD = 10  # 100 MHz
 GLTEST = False
-LocalTest = False
+LocalTest = True
 
-def busvals_and_gltest(dut):
-    global GLTEST
-    try:
-        dut._log.info("See if the test is being run for GLTEST")
-        if(dut.VPWR.value == 1):
-            GLTEST = True
-            dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
-            dut._log.info(f"Current bus values: input={dut.ui_in.value}, output={dut.uo_out.value}")
-            # dut._log.info(dir(dut.user_project)) # log runs out bruh
-            #for i in dir(dut.user_project):
-            #    dut._log.info(i)
-    except AttributeError:
-        GLTEST = False
-        dut._log.info("VPWR is NOT Defined, GLTEST=False")
-        assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
-        dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
-
-
-def bus_values(dut):
+async def bus_values(dut):
     dut._log.info(f"GLTEST={GLTEST}")
     if (not GLTEST):
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
     else:
         dut._log.info(f"Current bus values: input={dut.ui_in.value}, output={dut.uo_out.value}")
 
-def control_signal_values(dut):
+async def control_signal_values(dut):
     vals = dut.uio_in.value
     vals_out = dut.uio_out.value
     dut._log.info(f"Current control signal: {vals}")
@@ -95,7 +77,7 @@ def setbit(current, bit_index, bit_value):
         modified[bit_index] = bit_value
     return modified
 
-def determine_gltest(dut):
+async def determine_gltest(dut):
     global GLTEST
     try:
         dut._log.info("See if the test is being run for GLTEST")
@@ -115,7 +97,8 @@ async def init(dut):
     clock = Clock(dut.clk, CLOCK_PERIOD, units="ns")
     cocotb.start_soon(clock.start())
     dut._log.info("Reset signals")
-    busvals_and_gltest(dut) # For some unknown reason, determine_gltest sometimes executes after bus_vals, which makes 0 sense
+    await determine_gltest(dut) # For some unknown reason, determine_gltest sometimes executes after bus_vals, which makes 0 sense
+    await bus_values(dut)
     dut.rst_n.value = 0
     dut.uio_in.value = LogicArray("1110000Z")
     # dut.uio_in.value[0] = 1 # Output Bus/RegA
@@ -131,8 +114,8 @@ async def init(dut):
     dut.rst_n.value = 1
     await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF
     await RisingEdge(dut.clk) 
-    control_signal_values(dut)
-    bus_values(dut)
+    await control_signal_values(dut)
+    await bus_values(dut)
     if (not GLTEST):
         assert (dut.uo_out.value == "zzzzzzzz") and (dut.user_project.bus.value == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
     else:
@@ -149,7 +132,7 @@ async def enable_regA_output(dut):
     # dut.uio_in.value[3] = 1 # RegA output, Ea
     dut._log.info("Wait for Hi-Z to propogate to bus, and for control signals to update (Falling edge)")
     await FallingEdge(dut.clk)
-    control_signal_values(dut)
+    await control_signal_values(dut)
     if (not GLTEST):
         assert (read_control_signal_bit(dut.uio_in.value,3) == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
         assert (dut.uo_out.value != "zzzzzzzz") and (dut.uo_out.value != "xxxxxxxx") and (dut.user_project.regA.value == dut.uo_out.value), f"RegA read failed: got {dut.uo_out.value}"
@@ -181,8 +164,8 @@ async def regAB_load_helper(dut, reg, val):
     await RisingEdge(dut.clk)
     await FallingEdge(dut.clk)
     await RisingEdge(dut.clk)
-    bus_values(dut)
-    control_signal_values(dut)
+    await bus_values(dut)
+    await control_signal_values(dut)
     if (not GLTEST):
         assert (dut.uo_out.value == val) and (dut.user_project.bus.value == val), f"Bus load failed: expected {val}, got {dut.uo_out.value}"
     else:
