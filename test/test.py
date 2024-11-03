@@ -79,15 +79,15 @@ def setbit(current, bit_index, bit_value):
 
 async def determine_gltest(dut):
     global GLTEST
-    try:
-        dut._log.info("See if the test is being run for GLTEST")
+    dut._log.info("See if the test is being run for GLTEST")
+    if hasattr(dut, 'VPWR'):
         if(dut.VPWR.value == 1):
             GLTEST = True
             dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
             # dut._log.info(dir(dut.user_project)) # log runs out bruh
             #for i in dir(dut.user_project):
             #    dut._log.info(i)
-    except AttributeError:
+    else:
         GLTEST = False
         dut._log.info("VPWR is NOT Defined, GLTEST=False")
         assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
@@ -98,7 +98,6 @@ async def init(dut):
     cocotb.start_soon(clock.start())
     dut._log.info("Reset signals")
     await determine_gltest(dut) # For some unknown reason, determine_gltest sometimes executes after bus_vals, which makes 0 sense
-    await FallingEdge(dut.clk)
     await bus_values(dut)
     dut.rst_n.value = 0
     dut.uio_in.value = LogicArray("1110000Z")
