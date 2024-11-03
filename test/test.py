@@ -85,7 +85,9 @@ async def init(dut):
         if(dut.VPWR.value == 1):
             GLTEST = True
             dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
-            dut._log.info(dir(dut.user_project))
+            # dut._log.info(dir(dut.user_project)) # log runs out bruh
+            for i in dir(dut.user_project):
+                dut._log.info(i)
     except AttributeError:
         dut._log.info("VPWR is NOT Defined, GLTEST=False")
         assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
