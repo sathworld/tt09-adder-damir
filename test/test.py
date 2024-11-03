@@ -82,8 +82,8 @@ async def init(dut):
             GLTEST = True
             dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
             # dut._log.info(dir(dut.user_project)) # log runs out bruh
-            for i in dir(dut.user_project):
-                dut._log.info(i)
+            #for i in dir(dut.user_project):
+            #    dut._log.info(i)
     except AttributeError:
         dut._log.info("VPWR is NOT Defined, GLTEST=False")
         assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
@@ -94,7 +94,7 @@ async def init(dut):
     cocotb.start_soon(clock.start())
 
     dut._log.info("Reset signals")
-    bus_values(dut)
+    await bus_values(dut)
     dut.uio_in.value = LogicArray("111000ZZ")
     # dut.uio_in.value[0] = 1 # Output Bus
     # dut.uio_in.value[1] = 1 # RegA, nLa
