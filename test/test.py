@@ -46,21 +46,49 @@ from random import randint, shuffle
 #     # one or more clock cycles, and asserting the expected output values.
 
 CLOCK_PERIOD = 10  # 100 MHz
+GLTEST = False
+LocalTest = False
 
 def bus_values(dut):
-    dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
+    if (not GLTEST):
+        dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={dut.user_project.bus.value}, output={dut.uo_out.value}")
+    else:
+        bus = LogicArray("XXXXXXXX")
+        for i in range(8):
+            bus[i] = dut.user_project.accumulatorobj.bus[i]
+        dut._log.info(f"Current bus values: input={dut.ui_in.value}, bus={bus}, output={dut.uo_out.value}")
 def control_signal_values(dut):
     vals = dut.uio_in.value
     dut._log.info(f"Current control signal: {dut.uio_in.value}")
-    dut._log.info(f"Current control signal values: output bus/n(regA)={vals[0]}, nLa={vals[1]}, nLb={vals[2]}, Ea={vals[3]}, Eu={vals[4]}, sub={vals[5]}, CF={vals[6]}, ZF={vals[7]}")
+    dut._log.info(f"Current control signal values: output bus/n(regA)={read_control_signal_bit(vals,0)}, nLa={read_control_signal_bit(vals,1)}, nLb={read_control_signal_bit(vals,2)}, Ea={read_control_signal_bit(vals,3)}, Eu={read_control_signal_bit(vals,4)}, sub={read_control_signal_bit(vals,5)}, CF={read_control_signal_bit(vals,6)}, ZF={read_control_signal_bit(vals,7)}")
 
+def read_control_signal_bit(current, bit_index):
+    if LocalTest:
+        return current[7-bit_index]
+    else:
+        return current[bit_index]
 
 def setbit(current, bit_index, bit_value):
     modified = current
-    modified[bit_index] = bit_value
+    if LocalTest:
+        modified[7-bit_index] = bit_value
+    else:
+        modified[bit_index] = bit_value
     return modified
 
 async def init(dut):
+    global GLTEST
+
+    try:
+        dut._log.info("See if the test is being run for GLTEST")
+        if(dut.VPWR.value == 1):
+            GLTEST = True
+            dut._log.info("VPWR is Defined, and equal to 1, GLTEST=True")
+    except AttributeError:
+        dut._log.info("VPWR is NOT Defined, GLTEST=False")
+        assert dut.user_project.bus.value == dut.user_project.bus.value, "Something went terribly wrong"
+
+
     dut._log.info("Initialize clock")
     clock = Clock(dut.clk, CLOCK_PERIOD, units="ns")
     cocotb.start_soon(clock.start())
@@ -81,7 +109,13 @@ async def init(dut):
     await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF 
     control_signal_values(dut)
     bus_values(dut)
-    assert (dut.uo_out.value == "zzzzzzzz") and (dut.user_project.bus.value == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
+    if (not GLTEST):
+        assert (dut.uo_out.value == "zzzzzzzz") and (dut.user_project.bus.value == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
+    else:
+        bus = LogicArray("XXXXXXXX")
+        for i in range(8):
+            bus[i] = dut.user_project.accumulatorobj.bus[i]
+        assert (dut.uo_out.value == "zzzzzzzz") and (bus == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={bus}, output={dut.uo_out.value}"""
 
 
 async def enable_regA_output(dut):
@@ -93,7 +127,7 @@ async def enable_regA_output(dut):
     dut._log.info("Wait for Hi-Z to propogate to bus, and for control signals to update (Falling edge)")
     await FallingEdge(dut.clk)
     control_signal_values(dut)
-    assert (dut.uio_in.value[3] == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
+    assert (read_control_signal_bit(dut.uio_in.value,3) == 1) and (dut.user_project.Ea.value == 1), "Ea did not get set"
     assert (dut.uo_out.value != "zzzzzzzz") and (dut.uo_out.value != "xxxxxxxx") and (dut.user_project.regA.value == dut.uo_out.value), f"RegA read failed: got {dut.uo_out.value}"
 
 
