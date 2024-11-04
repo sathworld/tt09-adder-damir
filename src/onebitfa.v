@@ -3,7 +3,7 @@ module onebitfa (
     input  wire b,      // Operand B
     input  wire cin,    // Carry in
     output wire sum,    // Sum
-    output wire cout   // Carry out
+    output wire cout    // Carry out
 );
 
   // Internal components
