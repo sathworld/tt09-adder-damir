@@ -1,22 +1,19 @@
-module alu (
-    input  wire       clk, // Clock signal
-    input  wire       enable_output, // Output result to the 8 bit bus when 1
-    input  wire [7:0] reg_a, // Register A
-    input  wire [7:0] reg_b, // Register B
-    input  wire       sub, // Addition/Subtraction if 0/1
-    output wire [7:0] bus, // Connection to the bus
-    output reg        CF, // Carry out flag
-    output reg        ZF // Indicates if the result of the sum is 0
+module accumulator_register (
+    input  wire       clk,            // Clock (Rising edge)
+    inout  wire [7:0] bus,            // Bus (8 bits)
+    input  wire       load,           // Enable ALU output to the bus (ACTIVE-HIGH)
+    input  wire       enable_output,  // Output regA to the 8 bit bus when 1,
+    output reg  [7:0] regA,           // Register A (8 bits)
+    input  wire       rst_n           // Reset (ACTIVE-LOW)
 );
-  wire carry_out;
-  wire res_zero;
-  wire [7:0] sum;
-  add_sub_8bit addsub(reg_a, reg_b, sub, sum, carry_out, res_zero);
-  assign bus = enable_output ? sum : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
-  always @(posedge clk) begin
-    if (enable_output) begin
-      CF <= carry_out;
-      ZF <= res_zero;
-    end
+  // Accumulator Register //
+  always @(posedge clk or negedge rst_n) begin // Update on Clock (Rising edge) or Reset (Fallling edge)
+      if (!rst_n)                              // Reset regA to 0 when rst_n is low
+        regA <= 8'b00000000;
+      else if (!load)                          // Load regA from the bus when load is low (ACTIVE-LOW)                         
+        regA <= bus;
   end
+  // Tri-state buffer to connect to the bus //
+  assign bus = enable_output ? regA : 8'bZZZZZZZZ; // Tri-state buffer to connect to the bus;
+  
 endmodule
