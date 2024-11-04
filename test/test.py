@@ -47,7 +47,7 @@ from random import randint, shuffle
 
 CLOCK_PERIOD = 10  # 100 MHz
 GLTEST = False
-LocalTest = False
+LocalTest = True
 
 async def bus_values(dut):
     dut._log.info(f"GLTEST={GLTEST}")
@@ -173,6 +173,7 @@ async def regAB_load_helper(dut, reg, val):
     controlsignal_value = setbit(controlsignal_value, 1, 1)
     dut.uio_in.value = setbit(controlsignal_value, 2, 1)
     dut.ui_in.value = LogicArray("ZZZZZZZZ")
+    await FallingEdge(dut.clk)
     
     #dut.uio_in.value[1] = 1
     #dut.uio_in.value[2] = 1
@@ -253,43 +254,127 @@ async def accumulator_test_shuffled_range(dut):
     
     dut._log.info("Accumulator shuffled range module test completed successfully.")
 
-async def check_adder_operation(dut, operation, a, b, timeout_ns=200):
-    """ Helper function to test addition and subtraction operations of the adder module """
-    
-    # Set up inputs
-    dut.reg_a.value = a
-    dut.reg_b.value = b
-    dut.sub.value = operation
-    dut.enable_output.value = 1
-
-    # Calculate expected result based on the operation
+async def check_adder_operation(dut, operation, a, b):
+    dut._log.info("Test addition/subtraction operations of the adder module")
+    dut._log.info("Calculate expected result based on the operation")
     if operation == 0:
-        expected_result = (a + b) & 0xFF  # 8-bit overflow behavior for addition
+        expVal = (a + b) 
+        expCF = int((expVal & 0x100) >> 8)
+        expVal = expVal & 0xFF  # 8-bit overflow behavior for addition
         operation_name = "Addition"
     elif operation == 1:
-        expected_result = (a - b) & 0xFF  # 8-bit underflow behavior for subtraction
+        expVal = (a + ((b ^ 0xFF) + 1))
+        expCF = (expVal & 0x100) >> 8
+        expVal = expVal & 0xFF  # 8-bit underflow behavior for subtraction
         operation_name = "Subtraction"
     else:
         assert False, f"Unknown operation code: {operation}"
-
-    # Start timing
-    start_time = cocotb.utils.get_sim_time()
-
+    expZF = int(expVal == 0)
+    dut._log.info(f"Operation: {operation_name}, regA: {a} {a:#010b}, regB: {b} {b:#010b}")
+    dut._log.info(f"Expected result: {expVal}, bin: {expVal:#010b}, ZF: {expZF}, CF: {expCF}") 
     # Wait for result on the bus
-    result_stabilized = False
-    while not result_stabilized:
-        await RisingEdge(dut.clk)
-        if dut.bus.value == expected_result:
-            result_stabilized = True
-            break
-        if cocotb.utils.get_sim_time() - start_time >= timeout_ns:
-            assert False, f"Timeout: {operation_name} did not complete within {timeout_ns} ns."
-
-    # End timing
-    end_time = cocotb.utils.get_sim_time()
-    time_taken = end_time - start_time
-
+    controlsignal_value = setbit(dut.uio_in.value, 5, operation)
+    dut.uio_in.value = setbit(controlsignal_value, 4, 1)
+    await RisingEdge(dut.clk)
+    await control_signal_values(dut)
+    if (not GLTEST):
+        assert (dut.user_project.regA.value == a), f"RegA did not get set: expected {a}, got {dut.user_project.regA.value}"
+        assert (dut.user_project.regB.value == b), f"RegB did not get set: expected {b}, got {dut.user_project.regB.value}"
+        assert (read_control_signal_bit(dut.uio_in.value,4) == 1) and (dut.user_project.Eu.value == 1), "Eu did not get set"
+        assert (dut.uo_out.value == expVal) and (expVal == dut.user_project.bus.value), f"Enable adder output failed: expected {expVal} {expVal:#010b}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"
+    else:
+        assert (read_control_signal_bit(dut.uio_in.value,4) == 1), "Eu did not get set"
+        assert (dut.uo_out.value == expVal), f"Enable adder output failed: expected {expVal} {expVal:#010b}, got output={dut.uo_out.value}"
+    await FallingEdge(dut.clk)
+    if (not GLTEST):
+        # assert (read_control_signal_bit(dut.uio_out.value,6) == expCF) and (dut.user_project.CF.value == expCF), f"Carry flag failed: expected {expCF}, got {dut.user_project.CF.value}"
+        assert dut.user_project.CF.value == expCF, f"Carry flag failed: expected {expCF}, got {dut.user_project.CF.value}"
+        assert (read_control_signal_bit(dut.uio_out.value,7) == expZF) and (dut.user_project.ZF.value == expZF), f"Zero flag failed: expected {expZF}, got {dut.user_project.ZF.value}"
+    else:
+        # assert (read_control_signal_bit(dut.uio_out.value,6) == expCF), f"Carry flag failed: expected {expCF}, got {dut.uo_out.value}"
+        assert (read_control_signal_bit(dut.uio_out.value,7) == expZF), f"Zero flag failed: expected {expZF}, got {dut.uo_out.value}"
+        
     # Verify and log
-    result = dut.bus.value
-    assert result == expected_result, f"Test failed for {operation_name} with a={a}, b={b}. Expected {expected_result}, got {result}."
-    dut._log.info(f"{operation_name} operation successful: a={a}, b={b}, result={result} (Time taken: {time_taken} ns)")
+    dut.uio_in.value = setbit(dut.uio_in.value, 4, 0)
+    await FallingEdge(dut.clk)
+    dut._log.info(f"{operation_name} operation successful: a={a}, b={b}, result={expVal}")
+
+
+@cocotb.test()
+async def adder_test_addition_range(dut):
+    dut._log.info("Test the adder module adding/subtracting with a shuffled range of 0-255")
+    await init(dut)
+
+    test_regA_values = list(range(0,255))
+    shuffle(test_regA_values)
+    test_regA_values = test_regA_values[:50]
+    
+    test_regB_values = list(range(0,255))
+    shuffle(test_regB_values)
+    test_regB_values = test_regB_values[:50]
+    
+    operation_dict = {0: "Addition", 1: "Subtraction"}
+
+    for regA_val in test_regA_values:
+        for regB_val in test_regB_values:
+            operation = 0
+            dut._log.info(f"Testing {operation_dict[operation]} operation for regA={regA_val}, regA_bin={regA_val:#010b} and regB={regB_val}, regB_bin={regB_val:#010b}")
+            await regAB_load_helper(dut, 'a', regA_val)
+            await FallingEdge(dut.clk)
+            await regAB_load_helper(dut, 'b', regB_val)
+            dut.uio_in.value = setbit(dut.uio_in.value, 5, operation)
+            
+            await check_adder_operation(dut, operation, regA_val, regB_val)            
+    dut._log.info("Adder module test completed successfully.")
+
+@cocotb.test()
+async def adder_test_subtraction_range(dut):
+    dut._log.info("Test the adder module adding/subtracting with a shuffled range of 0-255")
+    await init(dut)
+
+    test_regA_values = list(range(0,255))
+    shuffle(test_regA_values)
+    test_regA_values = test_regA_values[:50]
+    
+    test_regB_values = list(range(0,255))
+    shuffle(test_regB_values)
+    test_regB_values = test_regB_values[:50]
+    
+    operation_dict = {0: "Addition", 1: "Subtraction"}
+
+    for regA_val in test_regA_values:
+        for regB_val in test_regB_values:
+            operation = 1
+            dut._log.info(f"Testing {operation_dict[operation]} operation for regA={regA_val}, regA_bin={regA_val:#010b} and regB={regB_val}, regB_bin={regB_val:#010b}")
+            await regAB_load_helper(dut, 'a', regA_val)
+            await FallingEdge(dut.clk)
+            await regAB_load_helper(dut, 'b', regB_val)
+            dut.uio_in.value = setbit(dut.uio_in.value, 5, operation)
+            await check_adder_operation(dut, operation, regA_val, regB_val)            
+    dut._log.info("Adder module test completed successfully.")
+
+@cocotb.test()
+async def adder_test_addsub_range(dut):
+    dut._log.info("Test the adder module adding/subtracting with a shuffled range of 0-255")
+    await init(dut)
+
+    test_regA_values = list(range(0,255))
+    shuffle(test_regA_values)
+    test_regA_values = test_regA_values[:50]
+    
+    test_regB_values = list(range(0,255))
+    shuffle(test_regB_values)
+    test_regB_values = test_regB_values[:50]
+    
+    operation_dict = {0: "Addition", 1: "Subtraction"}
+
+    for regA_val in test_regA_values:
+        for regB_val in test_regB_values:
+            operation = randint(0,1)
+            dut._log.info(f"Testing {operation_dict[operation]} operation for regA={regA_val}, regA_bin={regA_val:#010b} and regB={regB_val}, regB_bin={regB_val:#010b}")
+            await regAB_load_helper(dut, 'a', regA_val)
+            await FallingEdge(dut.clk)
+            await regAB_load_helper(dut, 'b', regB_val)
+            dut.uio_in.value = setbit(dut.uio_in.value, 5, operation)
+            await check_adder_operation(dut, operation, regA_val, regB_val)            
+    dut._log.info("Adder module test completed successfully.")
