@@ -16,21 +16,21 @@ These two modules work in tandem and are a part of a larger project which includ
 
 ## IO Table: Accumulator (A) Register
 
-| **Name**      | **Verilog**      | **Description**      | **I/O**          | **Width (bits)** | **Active @** |
+| **Name**      | **Verilog**      | **Description**      | **I/O**          | **Width (bits)** | **Active**       |
 | ------------- | ---------------- | -------------------- | ---------------- | ---------------- | ---------------- |
-| clk           | clk              | Clock Signal         | Input            | 1                | NA               |
-| bus           | bus              | Connection to bus    | Input/Output     | 8                | NA               |
+| clk           | clk              | Clock Signal         | Input            | 1                | Rising edge      |
+| bus           | bus              | Connection to bus    | IO               | 8                | NA               |
 | load          | nLa              | Load from Bus        | Input            | 1                | 0                |
-| enable_output | Ea               | Output to Bus        | Input            | 1                | 1                |
+| enable_out    | Ea               | Output to Bus        | Input            | 1                | 1                |
 | Register A    | regA             | Accumulator Register | Output           | 8                | NA               |
 | reset         | rst_n            | Reset Signal         | Input            | 1                | 0                |
 
 ## IO Table: ALU (Adder/Subtractor)
 
-| **Name**      | **Verilog**      | **Description**      | **I/O**          | **Width (bits)** | **Active @** |
+| **Name**      | **Verilog**      | **Description**      | **I/O**          | **Width (bits)** | **Active**       |
 | ------------- | ---------------- | -------------------- | ---------------- | ---------------- | ---------------- |
-| clk           | clk              | Clock Signal         | Input            | 1                | NA               |
-| enable_output | Eu               | Output to Bus        | Input            | 1                | 1                |
+| clk           | clk              | Clock Signal         | Input            | 1                | Rising edge      |
+| enable_out    | Eu               | Output to Bus        | Input            | 1                | 1                |
 | Register A    | reg_a            | Accumulator Register | Input            | 8                | NA               |
 | Register B    | reg_b            | Register B           | Input            | 8                | NA               |
 | subtract      | sub              | Perform Subtraction  | Input            | 1                | 1                |
