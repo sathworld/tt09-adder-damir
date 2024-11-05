@@ -27,14 +27,14 @@ project:
 # The pinout of your project. Leave unused pins blank. DO NOT delete or add any pins.
 pinout:
   # Inputs
-  ui[0]: "bus[0] when loading_onto_bus"
-  ui[1]: "bus[1] when loading_onto_bus"
-  ui[2]: "bus[2] when loading_onto_bus"
-  ui[3]: "bus[3] when loading_onto_bus"
-  ui[4]: "bus[4] when loading_onto_bus"
-  ui[5]: "bus[5] when loading_onto_bus"
-  ui[6]: "bus[6] when loading_onto_bus"
-  ui[7]: "bus[7] when loading_onto_bus"
+  ui[0]: "bus[0] if loading_onto_bus"
+  ui[1]: "bus[1] if loading_onto_bus"
+  ui[2]: "bus[2] if loading_onto_bus"
+  ui[3]: "bus[3] if loading_onto_bus"
+  ui[4]: "bus[4] if loading_onto_bus"
+  ui[5]: "bus[5] if loading_onto_bus"
+  ui[6]: "bus[6] if loading_onto_bus"
+  ui[7]: "bus[7] if loading_onto_bus"
 
   # Outputs
   uo[0]: "bus[0]/regA[0], bus_regA_sel = 1/0"
