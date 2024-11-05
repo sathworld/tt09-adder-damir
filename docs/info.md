@@ -16,7 +16,7 @@ These two modules work in tandem and are a part of a larger project which includ
 
 ## IO Table: Accumulator (A) Register
 
-| **Name**      | **Verilog Name** | **Description**      | **Input/Output** | **Width (bits)** | **Active State** |
+| **Name**      | **Verilog**      | **Description**      | **I/O**          | **Width (bits)** | **Active @** |
 | ------------- | ---------------- | -------------------- | ---------------- | ---------------- | ---------------- |
 | clk           | clk              | Clock Signal         | Input            | 1                | NA               |
 | bus           | bus              | Connection to bus    | Input/Output     | 8                | NA               |
@@ -27,7 +27,7 @@ These two modules work in tandem and are a part of a larger project which includ
 
 ## IO Table: ALU (Adder/Subtractor)
 
-| **Name**      | **Verilog Name** | **Description**      | **Input/Output** | **Width (bits)** | **Active State** |
+| **Name**      | **Verilog**      | **Description**      | **I/O**          | **Width (bits)** | **Active @** |
 | ------------- | ---------------- | -------------------- | ---------------- | ---------------- | ---------------- |
 | clk           | clk              | Clock Signal         | Input            | 1                | NA               |
 | enable_output | Eu               | Output to Bus        | Input            | 1                | 1                |
