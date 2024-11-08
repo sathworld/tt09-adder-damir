@@ -287,11 +287,11 @@ async def check_adder_operation(dut, operation, a, b):
         assert (dut.uo_out.value == expVal), f"Enable adder output failed: expected {expVal} {expVal:#010b}, got output={dut.uo_out.value}"
     await FallingEdge(dut.clk)
     if (not GLTEST):
-        # assert (read_control_signal_bit(dut.uio_out.value,6) == expCF) and (dut.user_project.CF.value == expCF), f"Carry flag failed: expected {expCF}, got {dut.user_project.CF.value}"
+        assert (read_control_signal_bit(dut.uio_out.value,6) == expCF) and (dut.user_project.CF.value == expCF), f"Carry flag failed: expected {expCF}, got {dut.user_project.CF.value}"
         assert dut.user_project.CF.value == expCF, f"Carry flag failed: expected {expCF}, got {dut.user_project.CF.value}"
         assert (read_control_signal_bit(dut.uio_out.value,7) == expZF) and (dut.user_project.ZF.value == expZF), f"Zero flag failed: expected {expZF}, got {dut.user_project.ZF.value}"
     else:
-        # assert (read_control_signal_bit(dut.uio_out.value,6) == expCF), f"Carry flag failed: expected {expCF}, got {dut.uo_out.value}"
+        assert (read_control_signal_bit(dut.uio_out.value,6) == expCF), f"Carry flag failed: expected {expCF}, got {dut.uo_out.value}"
         assert (read_control_signal_bit(dut.uio_out.value,7) == expZF), f"Zero flag failed: expected {expZF}, got {dut.uo_out.value}"
         
     # Verify and log

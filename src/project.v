@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 Your Name
+ * Copyright (c) 2024 Damir Gazizullin; Owen Golden
  * SPDX-License-Identifier: Apache-2.0
  */
 
@@ -34,13 +34,13 @@ module tt_um_adder_accumulator_sathworld (
   // Buffer the input make gltest pass
   always @(posedge clk) begin
     // Buffer the input
-    if (!loading_onto_bus)      // Load the input onto the bus if loading_onto_bus is high
+    if (Ea | Eu)      // Load the input onto the bus if loading_onto_bus is high
       ui_in_buf <= 8'b00000000; // Set to 0 when not loading onto the bus
     else
       ui_in_buf <= ui_in;       // Load the input onto the bus
   end
   // Tri-state buffer to connect ui_in to the bus //
-  assign bus = (loading_onto_bus) ? ui_in_buf : 8'bZZZZZZZZ;
+  assign bus = (~(Ea | Eu)) ? ui_in_buf : 8'bZZZZZZZZ;
   // Tri-state buffer to connect uo out to regA when 0 or bus when 1
   assign uo_out = bus_regA_sel ? bus : regA; 
   
@@ -52,7 +52,6 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_out[4] = 0; // Unused
   assign uio_out[3] = 0; // Unused
   assign uio_out[2] = 0; // Unused
-  assign uio_out[1] = 0; // Unused
 
   // Configure the IOs //
   assign uio_oe[7] = 0;  // Set IO[7] to be an input
@@ -61,19 +60,19 @@ module tt_um_adder_accumulator_sathworld (
   assign uio_oe[4] = 0;  // Set IO[4] to be an input
   assign uio_oe[3] = 0;  // Set IO[3] to be an input
   assign uio_oe[2] = 0;  // Set IO[2] to be an input
-  assign uio_oe[1] = 0;  // Set IO[1] to be an input
+  assign uio_oe[1] = 1;  // Set IO[1] to be an output
   assign uio_oe[0] = 1;  // Set IO[0] to be an output
 
   // Configure the control signals //
   assign bus_regA_sel = uio_in[7];      // Select uo_put to be regA when 0 or bus when 1
   assign nLa = uio_in[6];               // enable Accumulator Register load from bus (ACTIVE-LOW)
   assign nLb = uio_in[5];               // enable B Register load from bus (ACTIVE-LOW)
-  assign Ea = uio_in[4];                // enable Accumulator Register output to the bus (ACTIVE-HIGH)
+  assign Ea = uio_in[4];  // enable Accumulator Register output to the bus (ACTIVE-HIGH) (loading_onto_bus takes priority)
   assign Eb = 0;                        // B is never output to the bus
-  assign Eu = uio_in[3];                // enable ALU output to the bus (ACTIVE-HIGH)
+  assign Eu = uio_in[3] & (~Ea); // enable ALU output to the bus (ACTIVE-HIGH) (loading_onto_bus takes priority), (Ea takes priority)
   assign sub = uio_in[2];               // perform addition when 0, perform subtraction when 1
-  assign loading_onto_bus = uio_in[1];  // Load the bus with the value from ui_in (ACTIVE-HIGH)
-  // assign uio_out[1] = CF;            // Carry Flag (DEPRECATED in favor of loading_onto_bus)
+  // assign loading_onto_bus = uio_in[1];  // Load the bus with the value from ui_in (ACTIVE-HIGH)
+  assign uio_out[1] = CF;               // Carry Flag
   assign uio_out[0] = ZF;               // Zero Flag
 
   // Instantiate the modules //
