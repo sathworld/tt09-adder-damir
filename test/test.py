@@ -103,7 +103,7 @@ async def init(dut):
     # dut.uio_in.value[3] = 0 # RegA output, Ea
     # dut.uio_in.value[4] = 0 # ALU output, Eu
     # dut.uio_in.value[5] = 0 # Sub, sub
-    dut.ui_in.value = LogicArray("ZZZZZZZZ") # Bus
+    dut.ui_in.value = LogicArray("00000000") # Bus
 
     dut._log.info("Wait for control signals to propogate (control signals and bus updates are falling edge)")
     await RisingEdge(dut.clk)
@@ -113,15 +113,14 @@ async def init(dut):
     await control_signal_values(dut)
     await bus_values(dut)
     if (not GLTEST):
-        assert (dut.uo_out.value == "zzzzzzzz") and (dut.user_project.bus.value == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
+        assert (dut.uo_out.value == "00000000") and (dut.user_project.bus.value == dut.uo_out.value), f"""Bus load failed: expected {LogicArray("00000000")}, got bus={dut.user_project.bus.value}, output={dut.uo_out.value}"""
     else:
-        assert (dut.uo_out.value == "zzzzzzzz" or dut.uo_out.value == "xxxxxxxx"), f"""Bus load failed: expected {LogicArray("ZZZZZZZZ")}, got output={dut.uo_out.value}"""
+        assert (dut.uo_out.value == "00000000" or dut.uo_out.value == "00000000"), f"""Bus load failed: expected {LogicArray("00000000")}, got output={dut.uo_out.value}"""
 
 
 async def enable_regA_output(dut):
     dut._log.info("Flush bus to Hi-Z; Set RegA output to high")
     await RisingEdge(dut.clk)
-    dut.ui_in.value = LogicArray("ZZZZZZZZ")
     dut.uio_in.value = setbit(dut.uio_in.value, 6, 0)
     await RisingEdge(dut.clk)
     dut.uio_in.value = setbit(dut.uio_in.value, 3, 1)
@@ -172,7 +171,6 @@ async def regAB_load_helper(dut, reg, val):
     controlsignal_value = setbit(dut.uio_in.value, 6, 0)
     controlsignal_value = setbit(controlsignal_value, 1, 1)
     dut.uio_in.value = setbit(controlsignal_value, 2, 1)
-    dut.ui_in.value = LogicArray("ZZZZZZZZ")
     await FallingEdge(dut.clk)
     
     #dut.uio_in.value[1] = 1
