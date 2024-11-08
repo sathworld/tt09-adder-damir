@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024 Damir Gazizullin; Owen Golden
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 module add_sub_8bit (
     input  wire [7:0] op_a,       // Operand A (8 bits)
     input  wire [7:0] op_b,       // Operand B (8 bits)

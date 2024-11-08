@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024 Damir Gazizullin; Owen Golden
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 module accumulator_register (
     input  wire       clk,            // Clock (Rising edge)
     inout  wire [7:0] bus,            // Bus (8 bits)

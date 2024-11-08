@@ -1,3 +1,7 @@
+/*
+ * Copyright (c) 2024 Damir Gazizullin; Owen Golden
+ * SPDX-License-Identifier: Apache-2.0
+ */
 module onebitfa (
     input  wire a,      // Operand A
     input  wire b,      // Operand B

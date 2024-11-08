@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2024 Damir Gazizullin; Owen Golden
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 module alu (
     input  wire       clk,            // Clock signal (Rising edge) (needed for storing CF and ZF)
     input  wire       enable_output,  // Enable ALU output to the bus (ACTIVE-HIGH)
