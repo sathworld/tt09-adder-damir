@@ -171,8 +171,9 @@ async def regAB_load_helper(dut, reg, val):
     controlsignal_value = setbit(dut.uio_in.value, 6, 0)
     controlsignal_value = setbit(controlsignal_value, 1, 1)
     dut.uio_in.value = setbit(controlsignal_value, 2, 1)
-    await FallingEdge(dut.clk)
     
+    await FallingEdge(dut.clk)
+    dut.ui_in.value = LogicArray("00000000")
     #dut.uio_in.value[1] = 1
     #dut.uio_in.value[2] = 1
     # dut.nLa.value = 1
