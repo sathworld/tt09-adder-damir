@@ -25,7 +25,6 @@ module tt_um_adder_accumulator_sathworld (
   wire [7:0] regA;              // Accumulator Register (8 bits)
   wire [7:0] regB;              // B Register (8 bits)
   wire sub;                     // perform addition when 0, perform subtraction when 1
-  wire loading_onto_bus;        // Load the bus with the value from ui_in (ACTIVE-HIGH)
   wire CF;                      // Carry Flag
   wire ZF;                      // Zero Flag
   wire bus_regA_sel;            // Select uo_put to be regA when 0 or bus when 1
