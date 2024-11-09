@@ -96,7 +96,7 @@ async def init(dut):
     await determine_gltest(dut) # For some unknown reason, determine_gltest sometimes executes after bus_vals, which makes 0 sense
     await bus_values(dut)
     dut.rst_n.value = 0
-    dut.uio_in.value = LogicArray("1110000Z")
+    dut.uio_in.value = LogicArray("111000ZZ")
     # dut.uio_in.value[0] = 1 # Output Bus/RegA
     # dut.uio_in.value[1] = 1 # RegA, nLa
     # dut.uio_in.value[2] = 1 # RegB, nLb
@@ -106,7 +106,9 @@ async def init(dut):
     dut.ui_in.value = LogicArray("00000000") # Bus
 
     dut._log.info("Wait for control signals to propogate (control signals and bus updates are falling edge)")
+    await FallingEdge(dut.clk)
     await RisingEdge(dut.clk)
+    await FallingEdge(dut.clk)
     dut.rst_n.value = 1
     await FallingEdge(dut.clk) # <- THIS SHIT IS ANNOYING AF
     await RisingEdge(dut.clk) 
